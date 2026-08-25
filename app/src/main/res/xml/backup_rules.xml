@@ -6,8 +6,6 @@
    See https://developer.android.com/about/versions/12/backup-restore
 -->
 <full-backup-content>
-    <!--
-   <include domain="sharedpref" path="."/>
-   <exclude domain="sharedpref" path="device.xml"/>
--->
+    <!-- Provider credentials are encrypted with a device-bound Android Keystore key. -->
+    <exclude domain="sharedpref" path="wordforge_llm_credentials.xml" />
 </full-backup-content>

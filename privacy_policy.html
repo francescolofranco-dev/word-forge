@@ -22,35 +22,37 @@
 </head>
 <body>
     <h1>WordForge — Privacy Policy</h1>
-    <p class="updated">Last updated: February 2026</p>
+    <p class="updated">Last updated: August 19, 2026</p>
 
     <h2>Overview</h2>
-    <p>WordForge is a vocabulary learning app that runs entirely on your device. Your privacy is simple: we don't collect, store, or transmit any of your data. Period.</p>
+    <p>WordForge is a vocabulary learning app. Its core vocabulary and spaced-repetition features run locally. If you choose to connect an AI provider and start an AI exercise session, the app sends only the selected learning content and session instructions to that provider to generate the exercises.</p>
 
     <h2>Data Storage</h2>
-    <p>All data you enter into WordForge — words, meanings, progress, and statistics — is stored locally on your device using an on-device database. This data never leaves your phone.</p>
+    <p>Words, meanings, conjugations, progress, and statistics are stored in an on-device database. If Android backup or device transfer is enabled for your device, Android may back up or transfer that local app data under your device and Google account settings. AI provider settings are stored locally. A developer API key that you enter is encrypted using Android Keystore before it is saved and is explicitly excluded from Android backup and device transfer.</p>
 
     <h2>Data Collection</h2>
-    <p>WordForge does not collect any personal information. We do not collect names, email addresses, location data, device identifiers, usage analytics, or any other personal data.</p>
+    <p>WordForge does not operate an account server and does not collect names, email addresses, location data, device identifiers, advertising identifiers, or usage analytics. When you request an AI exercise, the selected vocabulary may itself contain personal information if you entered such information as learning content.</p>
 
     <h2>Network Access</h2>
-    <p>WordForge does not require an internet connection and does not make any network requests. The app works entirely offline.</p>
+    <p>The core app works without internet access. AI exercise generation is optional and requires a network connection. When you explicitly start a session, WordForge sends the displayed number of selected words, meanings or conjugations, exercise count, and requested exercise types directly to your chosen provider over HTTPS. Review history, scores, reminders, database identifiers, and your answers in the interactive session are not sent.</p>
 
     <h2>Third-Party Services</h2>
-    <p>WordForge does not use any third-party analytics, advertising, or tracking services.</p>
+    <p>WordForge does not use third-party analytics, advertising, or tracking. Optional exercise generation can use OpenAI or the Google Gemini API, depending on your selection. Those services process requests under their own terms and privacy policies, and may retain request data according to the account and API settings you have with them. Your API subscription, charges, quotas, and provider account are managed by you. A ChatGPT or Gemini consumer subscription is not the same as developer API access.</p>
+    <p>Provider information: <a href="https://openai.com/policies/privacy-policy/">OpenAI Privacy Policy</a> · <a href="https://ai.google.dev/gemini-api/terms">Gemini API Terms</a> · <a href="https://policies.google.com/privacy">Google Privacy Policy</a>.</p>
 
     <h2>Permissions</h2>
-    <p>WordForge requests the following permission:</p>
+    <p>WordForge uses the following Android permissions:</p>
     <p><strong>Notifications:</strong> Used to send you word review reminders at scheduled times. This permission is optional — the app works without it, but you won't receive reminders. No notification data is sent to any server.</p>
+    <p><strong>Internet:</strong> Used only when you generate optional AI exercise sessions. Saving provider settings itself does not contact the provider. Regular vocabulary management and review remain available offline.</p>
 
     <h2>Data Deletion</h2>
-    <p>You can delete individual words or all words at any time from within the app. Uninstalling the app removes all stored data permanently.</p>
+    <p>You can delete individual words or all words at any time. Disconnecting an AI provider deletes its encrypted API key from WordForge. Uninstalling the app removes data on that device, but previously created Android backups may remain under your device or Google account backup controls and may be restorable later. Data already submitted to an AI provider is governed by that provider's retention and deletion controls.</p>
 
     <h2>Children's Privacy</h2>
-    <p>WordForge does not collect any data from anyone, including children. The app is safe for users of all ages.</p>
+    <p>WordForge does not knowingly collect children's personal information. Its local vocabulary and review features do not require an AI provider. AI exercise generation is protected by an eligibility confirmation and may be used only by people who meet the chosen provider's current age, account, region, audience, and purpose requirements. In particular, the current Gemini API terms require users to be at least 18 and prohibit API clients directed to, or likely to be accessed by, people under 18. Do not send a child's personal information as learning content.</p>
 
     <h2>Changes to This Policy</h2>
-    <p>If this privacy policy is updated, the changes will be reflected on this page with an updated date. Since WordForge collects no data, meaningful changes are unlikely.</p>
+    <p>If this privacy policy is updated, the changes will be reflected on this page with a new updated date.</p>
 
     <h2>Contact</h2>
     <p>If you have questions about this privacy policy, you can reach out at: <strong>lofrancofrancesco@gmail.com</strong></p>

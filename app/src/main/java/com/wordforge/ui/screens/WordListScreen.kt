@@ -25,7 +25,9 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material.icons.automirrored.rounded.HelpOutline
+import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.DarkMode
 import androidx.compose.material.icons.rounded.DeleteSweep
 import androidx.compose.material.icons.rounded.FolderOpen
@@ -33,6 +35,7 @@ import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material.icons.rounded.NotificationsActive
 import androidx.compose.material.icons.rounded.SaveAlt
+import androidx.compose.material.icons.rounded.SettingsSuggest
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -45,6 +48,7 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -96,6 +100,9 @@ fun WordListScreen(
     onNavigateToDetail: (String) -> Unit,
     onNavigateToHowItWorks: () -> Unit,
     onNavigateToOverdueReview: () -> Unit,
+    onNavigateToExerciseSetup: () -> Unit,
+    onNavigateToLlmSettings: () -> Unit,
+    aiProviderLabel: String?,
     themeMode: ThemeMode,
     onThemeModeChange: (ThemeMode) -> Unit,
     reminderFrequency: ReminderFrequency,
@@ -249,6 +256,26 @@ fun WordListScreen(
                             )
                             HorizontalDivider()
                             DropdownMenuItem(
+                                text = {
+                                    Column {
+                                        Text("AI exercise settings")
+                                        Text(
+                                            text = aiProviderLabel?.let { "Connected to $it" }
+                                                ?: "Not connected",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        )
+                                    }
+                                },
+                                leadingIcon = {
+                                    Icon(Icons.Rounded.SettingsSuggest, contentDescription = null)
+                                },
+                                onClick = {
+                                    menuOpen = false
+                                    onNavigateToLlmSettings()
+                                },
+                            )
+                            DropdownMenuItem(
                                 text = { Text("Theme: ${themeMode.label}") },
                                 leadingIcon = {
                                     Icon(Icons.Rounded.DarkMode, contentDescription = null)
@@ -351,6 +378,14 @@ fun WordListScreen(
                     .padding(horizontal = 20.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
+                item(key = "ai_exercise") {
+                    AiExerciseCard(
+                        providerLabel = aiProviderLabel,
+                        onClick = onNavigateToExerciseSetup,
+                        modifier = Modifier.padding(top = 4.dp),
+                    )
+                }
+
                 if (overdueCount > 0) {
                     item {
                         OverdueCard(
@@ -483,6 +518,61 @@ fun WordListScreen(
             onRequestNotificationPermission = onRequestNotificationPermission,
             onDismiss = { showReminderFrequencyDialog = false },
         )
+    }
+}
+
+@Composable
+private fun AiExerciseCard(
+    providerLabel: String?,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        onClick = onClick,
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        color = MaterialTheme.colorScheme.tertiaryContainer,
+        contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 18.dp, vertical = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(44.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.tertiary),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.AutoAwesome,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onTertiary,
+                )
+            }
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 14.dp),
+                verticalArrangement = Arrangement.spacedBy(2.dp),
+            ) {
+                Text(
+                    text = "AI practice session",
+                    style = MaterialTheme.typography.titleLarge,
+                )
+                Text(
+                    text = providerLabel?.let { "Create fresh exercises with $it" }
+                        ?: "Connect a provider and create exercises",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.8f),
+                )
+            }
+            Icon(
+                imageVector = Icons.AutoMirrored.Rounded.ArrowForward,
+                contentDescription = null,
+            )
+        }
     }
 }
 
