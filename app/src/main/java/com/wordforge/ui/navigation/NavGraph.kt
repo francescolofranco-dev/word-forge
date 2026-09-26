@@ -10,6 +10,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.wordforge.ui.screens.StatisticsScreen
 import com.wordforge.ui.screens.AddWordScreen
 import com.wordforge.ui.screens.EditWordScreen
 import com.wordforge.ui.screens.ExerciseSessionScreen
@@ -51,6 +52,7 @@ fun NavGraph(
         composable(Screen.WordList.route) {
             WordListScreen(
                 viewModel = viewModel,
+                onNavigateToStatistics = { navController.navigate(Screen.Statistics.route) },
                 onNavigateToAddWord = {
                     navController.navigate(Screen.AddWord.route)
                 },
@@ -79,6 +81,11 @@ fun NavGraph(
                 notificationsGranted = notificationsGranted,
                 onRequestNotificationPermission = onRequestNotificationPermission,
             )
+        }
+
+        composable(Screen.Statistics.route) {
+            val words by viewModel.allWords.collectAsStateWithLifecycle()
+            StatisticsScreen(words = words, onNavigateBack = { navController.popBackStack() })
         }
 
         composable(Screen.OverdueReview.route) {

@@ -27,6 +27,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material.icons.automirrored.rounded.HelpOutline
+import androidx.compose.material.icons.rounded.BarChart
 import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.DarkMode
 import androidx.compose.material.icons.rounded.DeleteSweep
@@ -96,6 +97,7 @@ import kotlin.time.Duration.Companion.seconds
 @Composable
 fun WordListScreen(
     viewModel: WordViewModel,
+    onNavigateToStatistics: () -> Unit,
     onNavigateToAddWord: () -> Unit,
     onNavigateToDetail: (String) -> Unit,
     onNavigateToHowItWorks: () -> Unit,
@@ -217,6 +219,9 @@ fun WordListScreen(
                     )
                 },
                 actions = {
+                    IconButton(onClick = onNavigateToStatistics) {
+                        Icon(Icons.Rounded.BarChart, contentDescription = "Statistics")
+                    }
                     IconButton(onClick = onNavigateToHowItWorks) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Rounded.HelpOutline,

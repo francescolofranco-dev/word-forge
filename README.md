@@ -14,6 +14,10 @@ Users are responsible for meeting the selected provider's current API eligibilit
 
 This is a personal bring-your-own-key integration. Android Keystore protects a saved key at rest, but no mobile client can make a long-lived developer key immune to extraction on a compromised or instrumented device. A production service distributed to untrusted devices should prefer a backend credential broker or provider-approved short-lived authorization flow.
 
+## Statistics
+
+Tap the chart icon on the home screen to see items added over the last seven local calendar days, the current distribution across learning tiers, and correct/incorrect review totals. Statistics include saved words and verb conjugations; deleted items and AI practice results are excluded.
+
 ## Build and test
 
 ```sh
