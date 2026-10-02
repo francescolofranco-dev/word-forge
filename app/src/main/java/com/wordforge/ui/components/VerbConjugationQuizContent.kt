@@ -16,10 +16,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Close
@@ -90,13 +88,12 @@ fun VerbConjugationQuizContent(
         }
     }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(vertical = 16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
+    QuizContentLayout(
+        wordId = word.id,
+        answered = answered,
+        onAdvance = onAdvance,
+        advanceLabel = advanceLabel,
+        modifier = modifier,
     ) {
         Text(
             text = "TIER $startingTier OF ${SpacedRepetition.MAX_TIER}",
@@ -105,16 +102,20 @@ fun VerbConjugationQuizContent(
             color = MaterialTheme.colorScheme.primary,
         )
 
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(if (answered) 8.dp else 14.dp))
 
         Text(
             text = word.word,
-            style = MaterialTheme.typography.displayLarge,
+            style = if (answered) {
+                MaterialTheme.typography.displayMedium
+            } else {
+                MaterialTheme.typography.displayLarge
+            },
             color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Center,
         )
 
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(if (answered) 8.dp else 10.dp))
 
         Surface(
             shape = RoundedCornerShape(50),
@@ -129,7 +130,7 @@ fun VerbConjugationQuizContent(
             )
         }
 
-        Spacer(modifier = Modifier.height(22.dp))
+        Spacer(modifier = Modifier.height(if (answered) 16.dp else 22.dp))
 
         Surface(
             modifier = Modifier
@@ -145,7 +146,7 @@ fun VerbConjugationQuizContent(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .defaultMinSize(minHeight = 64.dp)
+                            .defaultMinSize(minHeight = if (answered) 48.dp else 64.dp)
                             .padding(start = 18.dp, end = 8.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
@@ -199,7 +200,7 @@ fun VerbConjugationQuizContent(
             }
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(if (answered) 16.dp else 20.dp))
 
         when {
             !allRevealed -> {
@@ -258,17 +259,6 @@ fun VerbConjugationQuizContent(
                     correct = wasCorrect == true,
                     startingTier = startingTier,
                 )
-                Spacer(modifier = Modifier.height(20.dp))
-                Button(
-                    onClick = onAdvance,
-                    modifier = Modifier
-                        .widthIn(max = 560.dp)
-                        .fillMaxWidth()
-                        .height(56.dp),
-                    shape = RoundedCornerShape(28.dp),
-                ) {
-                    Text(advanceLabel, style = MaterialTheme.typography.titleLarge)
-                }
             }
         }
     }
@@ -358,15 +348,16 @@ private fun VerbAnswerFeedback(
         shape = RoundedCornerShape(18.dp),
         color = feedbackBg,
     ) {
-        Column(
+        Row(
             modifier = Modifier
-                .padding(20.dp)
+                .padding(14.dp)
                 .fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Box(
                 modifier = Modifier
-                    .size(44.dp)
+                    .size(32.dp)
                     .clip(CircleShape)
                     .background(feedbackAccent),
                 contentAlignment = Alignment.Center,
@@ -375,15 +366,14 @@ private fun VerbAnswerFeedback(
                     imageVector = feedbackIcon,
                     contentDescription = null,
                     tint = feedbackAccentContent,
-                    modifier = Modifier.size(26.dp),
+                    modifier = Modifier.size(20.dp),
                 )
             }
-            Spacer(modifier = Modifier.height(10.dp))
             Text(
                 text = feedbackText,
                 style = MaterialTheme.typography.titleMedium,
-                textAlign = TextAlign.Center,
                 color = feedbackContent,
+                modifier = Modifier.weight(1f),
             )
         }
     }

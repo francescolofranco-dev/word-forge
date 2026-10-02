@@ -13,17 +13,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Close
@@ -125,13 +122,12 @@ fun QuizContent(
     val density = LocalDensity.current.density
     val showingBack = flipRotation > 90f
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(vertical = 16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
+    QuizContentLayout(
+        wordId = word.id,
+        answered = answered,
+        onAdvance = onAdvance,
+        advanceLabel = advanceLabel,
+        modifier = modifier,
     ) {
         Text(
             text = "TIER $startingTier OF ${SpacedRepetition.MAX_TIER}",
@@ -344,19 +340,6 @@ fun QuizContent(
                         color = feedbackContent,
                     )
                 }
-            }
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            Button(
-                onClick = onAdvance,
-                modifier = Modifier
-                    .widthIn(max = 560.dp)
-                    .fillMaxWidth()
-                    .height(56.dp),
-                shape = RoundedCornerShape(28.dp),
-            ) {
-                Text(advanceLabel, style = MaterialTheme.typography.titleLarge)
             }
         }
     }
