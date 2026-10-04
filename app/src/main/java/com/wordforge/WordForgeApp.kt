@@ -4,6 +4,7 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import com.wordforge.data.NotificationPreferenceStore
+import com.wordforge.data.removeRetiredExerciseData
 import com.wordforge.notification.NotificationScheduler
 
 class WordForgeApp : Application() {
@@ -17,6 +18,7 @@ class WordForgeApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        removeRetiredExerciseData(this)
         createNotificationChannel()
         NotificationScheduler.cancelLegacySchedules(this)
         NotificationScheduler.ensureScheduled(

@@ -6,6 +6,7 @@
    See https://developer.android.com/about/versions/12/backup-restore
 -->
 <full-backup-content>
-    <!-- Provider credentials are encrypted with a device-bound Android Keystore key. -->
+    <!-- Keep retired data out of backups until startup cleanup runs. -->
     <exclude domain="sharedpref" path="wordforge_llm_credentials.xml" />
+    <exclude domain="sharedpref" path="wordforge_llm_settings.xml" />
 </full-backup-content>

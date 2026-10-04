@@ -4,6 +4,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.wordforge.data.LearningItemDraft
 import com.wordforge.data.LearningItemType
@@ -57,7 +58,7 @@ class LearningItemFormScaffoldInstrumentedTest {
         composeRule.onNodeWithTag("edit_verb_tense").performClick()
         composeRule.onNodeWithTag("verb_tense_option_1").performClick()
         composeRule.onNodeWithText("pretérito perfecto simple").assertExists()
-        composeRule.onNodeWithText("Save changes").performClick()
+        composeRule.onNodeWithText("Save changes").performScrollTo().performClick()
 
         composeRule.runOnIdle {
             assertNotNull(submitted)

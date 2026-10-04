@@ -100,7 +100,7 @@ fun StatisticsScreen(words: List<Word>, onNavigateBack: () -> Unit) {
             }
             item {
                 Text(
-                    "Charts use saved items and their review totals. Deleting an item removes it from these statistics. AI practice sessions are not included in review results.",
+                    "Charts use saved items and their review totals. Deleting an item removes it from these statistics.",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
