@@ -1,0 +1,98 @@
+name: Play release
+
+# Every push to main that touches the app is tested, built, signed and uploaded to Google Play.
+# Repository variables (gh variable set NAME --body VALUE) control where it goes:
+#   PLAY_TRACK           internal (default) | alpha | beta | production
+#   PLAY_RELEASE_STATUS  completed (default) | draft | inProgress
+#   PLAY_USER_FRACTION   staged rollout share when status is inProgress, e.g. 0.2
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+      - "scripts/**"
+      - "app/src/main/play/listings/**"
+  workflow_dispatch:
+
+concurrency:
+  group: play-release
+  cancel-in-progress: false
+
+permissions:
+  contents: write # push the play/<versionCode> tag that marks what was published
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      HAS_PLAY_CREDENTIALS: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON != '' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # versionCode is the commit count, release notes use history
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Restore upload key
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/upload.jks"
+          cat > keystore.properties <<EOF
+          storeFile=$RUNNER_TEMP/upload.jks
+          storePassword=$KEYSTORE_PASSWORD
+          keyAlias=upload
+          keyPassword=$KEYSTORE_PASSWORD
+          EOF
+
+      - name: Unit tests
+        run: ./gradlew :app:testDebugUnitTest
+
+      - name: Release notes from commits since the last published build
+        run: |
+          last=$(git describe --tags --abbrev=0 --match 'play/*' 2>/dev/null || true)
+          range=${last:+$last..}HEAD
+          git log --no-merges --format='• %s' "$range" | head -c 480 > notes.txt
+          [ -s notes.txt ] || echo "Bug fixes and improvements." > notes.txt
+          cp notes.txt app/src/main/play/release-notes/en-GB/default.txt
+          cat notes.txt
+
+      - name: Build signed bundle
+        run: ./gradlew :app:bundleRelease
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: app-release-aab
+          path: app/build/outputs/bundle/release/app-release.aab
+
+      - name: Upload to Google Play
+        if: env.HAS_PLAY_CREDENTIALS == 'true'
+        env:
+          ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+        run: >
+          ./gradlew :app:publishReleaseBundle
+          --track "${{ vars.PLAY_TRACK || 'internal' }}"
+          --release-status "${{ vars.PLAY_RELEASE_STATUS || 'completed' }}"
+          ${{ vars.PLAY_USER_FRACTION && format('--user-fraction {0}', vars.PLAY_USER_FRACTION) || '' }}
+
+      - name: Tag published build
+        if: env.HAS_PLAY_CREDENTIALS == 'true'
+        run: |
+          tag="play/$(git rev-list --count HEAD)"
+          git tag "$tag" && git push origin "$tag"
+
+      - name: Upload skipped
+        if: env.HAS_PLAY_CREDENTIALS != 'true'
+        run: echo "::warning::PLAY_SERVICE_ACCOUNT_JSON is not set; built the bundle but did not upload it."
+
+      - name: Remove credentials
+        if: always()
+        run: rm -f keystore.properties "$RUNNER_TEMP/upload.jks"
