@@ -24,7 +24,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "dev.lofrancolabs.wordforge"
+        applicationId = "com.wordforge"
         minSdk = 28
         targetSdk = 36
         versionCode = gitCommitCount.get()
@@ -111,5 +111,5 @@ dependencies {
 play {
     keystoreProperties.getProperty("playServiceAccount")?.let { serviceAccountCredentials.set(file(it)) }
     defaultToAppBundles.set(true)
-    track.set("internal")
+    track.set("alpha")
 }

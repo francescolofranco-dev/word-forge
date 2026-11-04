@@ -26,3 +26,44 @@ WordForge is an offline-first Android vocabulary and language trainer built with
 ./gradlew lintDebug
 ./gradlew assembleDebug
 ```
+
+### Play Store release
+
+Release builds are signed with the upload key when a root `keystore.properties` (untracked) exists:
+
+```properties
+storeFile=/absolute/path/to/upload.jks
+storePassword=...
+keyAlias=upload
+keyPassword=...
+```
+
+Without it, release artifacts are built unsigned. `versionCode` is the git commit count and
+`versionName` is `1.4.<versionCode>`, so every commit produces a higher version automatically.
+
+```bash
+./gradlew :app:bundleRelease
+# app/build/outputs/bundle/release/app-release.aab
+```
+
+Every push to `main` that changes the app runs `.github/workflows/release.yml`: unit tests, signed
+bundle, upload to Google Play, and a `play/<versionCode>` tag marking what was published. Release
+notes are the commit subjects since the previous `play/*` tag. Docs-only pushes are skipped.
+
+Repository variables choose the destination (`gh variable set NAME --body VALUE`):
+
+| Variable | Default | Values |
+|---|---|---|
+| `PLAY_TRACK` | `alpha` | `alpha`, `internal`, `beta`, `production` |
+| `PLAY_RELEASE_STATUS` | `completed` | `completed`, `draft`, `inProgress` (staged) |
+| `PLAY_USER_FRACTION` | unset | rollout share for `inProgress`, e.g. `0.2` |
+
+Required secrets: `KEYSTORE_BASE64` (base64 upload keystore), `KEYSTORE_PASSWORD`, and
+`PLAY_SERVICE_ACCOUNT_JSON` (Play Developer API service account key). Without the last one the
+workflow builds the bundle but skips the upload. To upload from your machine instead, add
+`playServiceAccount=/absolute/path/to/key.json` to `keystore.properties` and run
+`./gradlew :app:publishReleaseBundle`.
+
+Google Play only accepts each `versionCode` once, so a manual run (Actions → Play release) must be
+on a commit that has not been published yet. The very first upload of a new Play app has to be done
+by hand in Play Console; the Play Developer API cannot create apps.

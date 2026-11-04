@@ -2,7 +2,7 @@ name: Play release
 
 # Every push to main that touches the app is tested, built, signed and uploaded to Google Play.
 # Repository variables (gh variable set NAME --body VALUE) control where it goes:
-#   PLAY_TRACK           internal (default) | alpha | beta | production
+#   PLAY_TRACK           alpha (default) | internal | beta | production
 #   PLAY_RELEASE_STATUS  completed (default) | draft | inProgress
 #   PLAY_USER_FRACTION   staged rollout share when status is inProgress, e.g. 0.2
 on:
@@ -79,7 +79,7 @@ jobs:
           ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
         run: >
           ./gradlew :app:publishReleaseBundle
-          --track "${{ vars.PLAY_TRACK || 'internal' }}"
+          --track "${{ vars.PLAY_TRACK || 'alpha' }}"
           --release-status "${{ vars.PLAY_RELEASE_STATUS || 'completed' }}"
           ${{ vars.PLAY_USER_FRACTION && format('--user-fraction {0}', vars.PLAY_USER_FRACTION) || '' }}
 
