@@ -24,7 +24,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.wordforge"
+        applicationId = "dev.lofrancolabs.wordforge"
         minSdk = 28
         targetSdk = 36
         versionCode = gitCommitCount.get()
