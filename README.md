@@ -32,6 +32,9 @@ WordForge is an offline-first Android vocabulary and language trainer built with
 The Android application ID is `dev.lofrancolabs.wordforge`. This uses a new Google Play
 listing; the older `com.wordforge` listing cannot receive builds with the new ID.
 The Kotlin source namespace remains `com.wordforge` independently of the application ID.
+Closed-test opt-in: https://play.google.com/apps/testing/dev.lofrancolabs.wordforge.
+The first bundle for this listing, `1.4.70`, was uploaded manually; do not republish that
+version code. Subsequent app commits continue through the normal release workflow.
 
 Release builds are signed with the upload key when a root `keystore.properties` (untracked) exists:
 
