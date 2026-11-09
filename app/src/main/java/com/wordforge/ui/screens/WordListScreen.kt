@@ -107,6 +107,7 @@ fun WordListScreen(
 ) {
     val words by viewModel.allWords.collectAsStateWithLifecycle()
 
+    var wordToDelete by remember { mutableStateOf<Word?>(null) }
     var showDeleteAllDialog1 by remember { mutableStateOf(false) }
     var showAboutDialog by remember { mutableStateOf(false) }
     var showThemeDialog by remember { mutableStateOf(false) }
@@ -344,7 +345,8 @@ fun WordListScreen(
                     .padding(innerPadding)
             )
         } else {
-            val overdueCount = words.count { it.nextPromptAt <= now }
+            val overdueWords = words.filter { it.nextPromptAt <= now }.sortedBy { it.nextPromptAt }
+            val overdueCount = overdueWords.size
             val upcoming = words.filter { it.nextPromptAt > now }
             val upcomingSections = groupUpcomingWords(upcoming, now)
 
@@ -364,6 +366,25 @@ fun WordListScreen(
                             modifier = Modifier.padding(top = 4.dp),
                         )
                     }
+
+                    item(key = "section_ready") {
+                        Text(
+                            text = "Ready for review",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(top = 12.dp, bottom = 4.dp),
+                        )
+                    }
+
+                    items(overdueWords, key = { it.id }) { word ->
+                        UpcomingWordCard(
+                            word = word,
+                            now = now,
+                            onClick = { onNavigateToDetail(word.id) },
+                            onDelete = { wordToDelete = word },
+                            modifier = Modifier.animateItem(),
+                        )
+                    }
                 }
 
                 upcomingSections.forEach { (section, sectionWords) ->
@@ -381,7 +402,7 @@ fun WordListScreen(
                             word = word,
                             now = now,
                             onClick = { onNavigateToDetail(word.id) },
-                            onDelete = { deleteWithUndo(word) },
+                            onDelete = { wordToDelete = word },
                             modifier = Modifier.animateItem(),
                         )
                     }
@@ -390,6 +411,29 @@ fun WordListScreen(
                 item { Spacer(modifier = Modifier.height(96.dp)) }
             }
         }
+    }
+
+    wordToDelete?.let { targetWord ->
+        AlertDialog(
+            onDismissRequest = { wordToDelete = null },
+            title = { Text("Delete item") },
+            text = { Text("Delete \"${targetWord.word}\"?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        wordToDelete = null
+                        deleteWithUndo(targetWord)
+                    }
+                ) {
+                    Text("Delete", color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { wordToDelete = null }) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 
     if (showDeleteAllDialog1) {
@@ -543,7 +587,7 @@ private fun UpcomingWordCard(
 ) {
     WordCard(
         word = word.word,
-        meaning = listMeaning(word),
+        meaning = listMeaning(word, now),
         tier = word.currentTier,
         dueLabel = formatCompactDue(word.nextPromptAt, now),
         typeLabel = listTypeLabel(word),
@@ -553,8 +597,11 @@ private fun UpcomingWordCard(
     )
 }
 
-internal fun listMeaning(word: Word): String? =
-    word.meaning.takeIf { word.itemType == LearningItemType.SIMPLE_WORD }
+internal fun listMeaning(word: Word, now: Long? = null): String? {
+    if (word.itemType != LearningItemType.SIMPLE_WORD) return null
+    if (now != null && word.nextPromptAt <= now) return null
+    return word.meaning
+}
 
 internal fun listTypeLabel(word: Word): String? {
     if (word.itemType != LearningItemType.VERB_CONJUGATION) return null

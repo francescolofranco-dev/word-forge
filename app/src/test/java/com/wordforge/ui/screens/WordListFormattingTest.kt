@@ -56,6 +56,8 @@ class WordListFormattingTest {
         assertNull(listMeaning(verb))
         assertNull(listTypeLabel(word("tiempo", "2026-07-20T18:00:00Z")))
         assertEquals("meaning", listMeaning(word("tiempo", "2026-07-20T18:00:00Z")))
+        assertEquals("meaning", listMeaning(word("tiempo", "2026-07-20T18:00:00Z"), now))
+        assertNull(listMeaning(word("tiempo", "2026-07-20T09:00:00Z"), now))
     }
 
     private fun word(text: String, due: String) = Word(

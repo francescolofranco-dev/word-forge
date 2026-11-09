@@ -30,13 +30,13 @@ fun TierIndicator(
         modifier.semantics {
             contentDescription = "Tier $tier of $total"
         },
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        horizontalArrangement = Arrangement.spacedBy(5.dp),
     ) {
         repeat(total) { i ->
             Box(
                 Modifier
                     .height(6.dp)
-                    .width(20.dp)
+                    .width(16.dp)
                     .clip(RoundedCornerShape(3.dp))
                     .background(if (i < tier) color else MaterialTheme.colorScheme.outline)
             )

@@ -15,7 +15,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.DeleteOutline
+import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -63,12 +63,16 @@ fun WordCard(
             Row(
                 Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 TierIndicator(
                     tier = tier,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f, fill = false),
                 )
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
                     Text(
                         text = dueLabel,
                         style = MaterialTheme.typography.labelMedium,
@@ -79,7 +83,10 @@ fun WordCard(
                     )
                     if (onDelete != null) {
                         Box {
-                            IconButton(onClick = { menuOpen = true }) {
+                            IconButton(
+                                onClick = { menuOpen = true },
+                                modifier = Modifier.testTag("word_card_more_actions"),
+                            ) {
                                 Icon(Icons.Rounded.MoreVert, contentDescription = "Item actions")
                             }
                             DropdownMenu(
@@ -87,9 +94,18 @@ fun WordCard(
                                 onDismissRequest = { menuOpen = false },
                             ) {
                                 DropdownMenuItem(
-                                    text = { Text("Delete item") },
+                                    text = {
+                                        Text(
+                                            "Delete item",
+                                            color = MaterialTheme.colorScheme.error,
+                                        )
+                                    },
                                     leadingIcon = {
-                                        Icon(Icons.Rounded.DeleteOutline, contentDescription = null)
+                                        Icon(
+                                            Icons.Rounded.Delete,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.error,
+                                        )
                                     },
                                     onClick = {
                                         menuOpen = false
