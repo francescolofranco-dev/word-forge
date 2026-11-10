@@ -25,10 +25,12 @@ import androidx.core.content.ContextCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.WindowCompat
 import androidx.navigation.compose.rememberNavController
+import com.wordforge.data.ReminderFrequency
 import com.wordforge.data.ThemePreferenceStore
 import com.wordforge.data.NotificationPreferenceStore
 import com.wordforge.notification.NotificationScheduler
 import com.wordforge.notification.ReviewNotification
+import com.wordforge.ui.screens.OnboardingScreen
 import com.wordforge.ui.navigation.NavGraph
 import com.wordforge.ui.navigation.Screen
 import com.wordforge.ui.theme.WordForgeTheme
@@ -56,6 +58,9 @@ class MainActivity : ComponentActivity() {
             val notificationPreferenceStore = remember {
                 NotificationPreferenceStore(applicationContext)
             }
+            var onboardingComplete by remember {
+                mutableStateOf(notificationPreferenceStore.hasCompletedOnboarding)
+            }
             var themeMode by remember { mutableStateOf(themePreferenceStore.themeMode) }
             var hasShownNotificationEducation by remember {
                 mutableStateOf(notificationPreferenceStore.hasShownEducation)
@@ -77,7 +82,25 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
-                    NavGraph(
+                    val changeFrequency: (ReminderFrequency) -> Unit = { selected ->
+                        reminderFrequency = selected
+                        notificationPreferenceStore.reminderFrequency = selected
+                        NotificationScheduler.reschedule(applicationContext)
+                    }
+                    if (!onboardingComplete) {
+                        OnboardingScreen(
+                            reminderFrequency = reminderFrequency,
+                            onReminderFrequencyChange = changeFrequency,
+                            notificationsGranted = notificationsGranted,
+                            onRequestNotificationPermission = ::requestNotificationPermission,
+                            onComplete = {
+                                notificationPreferenceStore.hasCompletedOnboarding = true
+                                notificationPreferenceStore.hasShownEducation = true
+                                hasShownNotificationEducation = true
+                                onboardingComplete = true
+                            },
+                        )
+                    } else NavGraph(
                         navController = navController,
                         themeMode = themeMode,
                         onThemeModeChange = { selectedThemeMode ->
@@ -85,14 +108,7 @@ class MainActivity : ComponentActivity() {
                             themePreferenceStore.themeMode = selectedThemeMode
                         },
                         reminderFrequency = reminderFrequency,
-                        onReminderFrequencyChange = { selectedFrequency ->
-                            reminderFrequency = selectedFrequency
-                            notificationPreferenceStore.reminderFrequency = selectedFrequency
-                            NotificationScheduler.reschedule(
-                                applicationContext,
-                                selectedFrequency,
-                            )
-                        },
+                        onReminderFrequencyChange = changeFrequency,
                         notificationsGranted = notificationsGranted,
                         shouldOfferNotifications = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
                             !notificationsGranted && !hasShownNotificationEducation,
@@ -103,7 +119,8 @@ class MainActivity : ComponentActivity() {
                         onRequestNotificationPermission = ::requestNotificationPermission,
                     )
 
-                    LaunchedEffect(pendingWordId, pendingOverdueReview) {
+                    LaunchedEffect(pendingWordId, pendingOverdueReview, onboardingComplete) {
+                        if (!onboardingComplete) return@LaunchedEffect
                         val wordId = pendingWordId
                         when {
                             pendingOverdueReview -> {

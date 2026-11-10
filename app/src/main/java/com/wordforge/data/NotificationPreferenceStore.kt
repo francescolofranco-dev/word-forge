@@ -10,6 +10,14 @@ class NotificationPreferenceStore(context: Context) {
         Context.MODE_PRIVATE,
     )
 
+    var hasCompletedOnboarding: Boolean
+        get() = preferences.getBoolean("has_completed_onboarding", false)
+        set(value) { preferences.edit { putBoolean("has_completed_onboarding", value) } }
+
+    var lastInstantReminderAt: Long
+        get() = preferences.getLong("last_instant_reminder_at", 0L)
+        set(value) { preferences.edit { putLong("last_instant_reminder_at", value) } }
+
     var hasShownEducation: Boolean
         get() = preferences.getBoolean(KEY_HAS_SHOWN_EDUCATION, false)
         set(value) {

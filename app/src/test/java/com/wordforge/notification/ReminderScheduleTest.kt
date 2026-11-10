@@ -12,7 +12,7 @@ class ReminderScheduleTest {
     @Test
     fun frequenciesExposeOnlyTheSupportedDailyCounts() {
         assertEquals(
-            listOf(1, 2, 3, 5),
+            listOf(1, 2, 3, 5, 0),
             ReminderFrequency.entries.map { it.notificationsPerDay },
         )
         assertEquals(
@@ -49,6 +49,23 @@ class ReminderScheduleTest {
             localTime(2026, 7, 27, 18, 0),
             nextReminderAt(now, ReminderFrequency.TWICE),
         )
+    }
+
+    @Test
+    fun uncappedPreferenceRoundTrips() {
+        assertEquals(ReminderFrequency.EVERY_NEW_WORD, ReminderFrequency.fromStoredCount(0))
+    }
+
+    @Test
+    fun instantReminderUsesEarliestUnannouncedDueTime() {
+        assertEquals(8_000L, nextInstantReminderAt(listOf(3_000L, 9_000L, 8_000L), 5_000L, 6_000L))
+    }
+
+    @Test
+    fun missedInstantReminderCatchesUpWithoutRepeatingOldOverdueItems() {
+        assertEquals(11_000L, nextInstantReminderAt(listOf(3_000L, 8_000L), 5_000L, 10_000L))
+        assertEquals(null, nextInstantReminderAt(listOf(3_000L, 8_000L), 10_000L, 12_000L))
+        assertEquals(null, nextInstantReminderAt(emptyList(), 0L, 12_000L))
     }
 
     private fun localTime(

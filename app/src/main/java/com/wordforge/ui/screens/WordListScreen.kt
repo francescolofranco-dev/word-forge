@@ -718,7 +718,7 @@ private fun ReminderFrequencyDialog(
         text = {
             Column {
                 Text(
-                    text = "Choose how many times per day WordForge may remind you. Each reminder groups every item that is overdue at that time.",
+                    text = "Choose a daily maximum, or get a reminder whenever another item becomes due. Each notification groups the items ready to review.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -758,7 +758,7 @@ private fun ReminderFrequencyDialog(
 }
 
 @Composable
-private fun ReminderFrequencyOption(
+internal fun ReminderFrequencyOption(
     frequency: ReminderFrequency,
     selected: Boolean,
     onClick: () -> Unit,
@@ -803,6 +803,7 @@ private fun ReminderFrequency.shortLabel(): String = when (this) {
     ReminderFrequency.TWICE -> "Twice daily"
     ReminderFrequency.THREE_TIMES -> "3 times daily"
     ReminderFrequency.FIVE_TIMES -> "5 times daily"
+    ReminderFrequency.EVERY_NEW_WORD -> "Every new word"
 }
 
 private fun ReminderFrequency.longLabel(): String = when (this) {
@@ -810,10 +811,12 @@ private fun ReminderFrequency.longLabel(): String = when (this) {
     ReminderFrequency.TWICE -> "Twice per day"
     ReminderFrequency.THREE_TIMES -> "3 times per day"
     ReminderFrequency.FIVE_TIMES -> "5 times per day"
+    ReminderFrequency.EVERY_NEW_WORD -> "Every new word"
 }
 
 private fun ReminderFrequency.scheduleLabel(): String =
-    "Around " + slotHours.joinToString(" · ") { hour ->
+    if (this == ReminderFrequency.EVERY_NEW_WORD) "Whenever an item becomes due · No daily limit"
+    else "Around " + slotHours.joinToString(" · ") { hour ->
         "${hour.toString().padStart(2, '0')}:00"
     }
 

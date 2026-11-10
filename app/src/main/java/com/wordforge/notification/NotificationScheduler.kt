@@ -7,6 +7,14 @@ import android.content.Intent
 import androidx.core.app.AlarmManagerCompat
 import androidx.work.WorkManager
 import com.wordforge.data.ReminderFrequency
+import com.wordforge.data.NotificationPreferenceStore
+import com.wordforge.data.WordDatabase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.time.Instant
 import java.time.ZoneId
 
@@ -14,35 +22,47 @@ import java.time.ZoneId
  * Maintains one inexact, idle-capable alarm for the next grouped reminder.
  *
  * A single alarm avoids a backlog of missed slots firing together after a
- * sleeping device wakes. Each receiver invocation schedules the next future
- * slot before it reads the overdue items.
+ * sleeping device wakes. Uncapped reminders follow item due times; capped
+ * reminders use daily slots.
  */
 object NotificationScheduler {
 
-    fun ensureScheduled(
-        context: Context,
-        frequency: ReminderFrequency,
-        nowMillis: Long = System.currentTimeMillis(),
-    ) {
-        val now = Instant.ofEpochMilli(nowMillis).atZone(ZoneId.systemDefault())
-        val triggerAtMillis = nextReminderAt(now, frequency).toInstant().toEpochMilli()
-        val alarmManager = context.getSystemService(AlarmManager::class.java)
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val schedulingMutex = Mutex()
 
-        AlarmManagerCompat.setAndAllowWhileIdle(
-            alarmManager,
-            AlarmManager.RTC_WAKEUP,
-            triggerAtMillis,
-            reminderPendingIntent(context),
-        )
+    private fun ensureScheduled(context: Context) {
+        // Read the preference inside the lock so rapid setting changes cannot
+        // leave an older request's alarm behind.
+        scope.launch { scheduleNext(context.applicationContext) }
     }
 
-    fun reschedule(
-        context: Context,
-        frequency: ReminderFrequency,
-    ) {
-        cancelScheduledAlarm(context)
+    suspend fun scheduleNext(context: Context) = schedulingMutex.withLock {
+        val preferences = NotificationPreferenceStore(context)
+        val frequency = preferences.reminderFrequency
+        val nowMillis = System.currentTimeMillis()
+        val triggerAtMillis = if (frequency == ReminderFrequency.EVERY_NEW_WORD) {
+            val dueTimes = WordDatabase.getDatabase(context).wordDao()
+                .getAllOnce().map { it.nextPromptAt }
+            nextInstantReminderAt(dueTimes, preferences.lastInstantReminderAt, nowMillis)
+        } else {
+            val now = Instant.ofEpochMilli(nowMillis).atZone(ZoneId.systemDefault())
+            nextReminderAt(now, frequency).toInstant().toEpochMilli()
+        }
+        if (triggerAtMillis == null) {
+            cancelScheduledAlarm(context)
+        } else {
+            AlarmManagerCompat.setAndAllowWhileIdle(
+                context.getSystemService(AlarmManager::class.java),
+                AlarmManager.RTC_WAKEUP,
+                triggerAtMillis,
+                reminderPendingIntent(context),
+            )
+        }
+    }
+
+    fun reschedule(context: Context) {
         ReviewNotification.cancel(context)
-        ensureScheduled(context, frequency)
+        ensureScheduled(context)
     }
 
     fun cancelDisplayedSummary(context: Context) {

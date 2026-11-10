@@ -3,7 +3,11 @@ package com.wordforge
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import com.wordforge.data.NotificationPreferenceStore
+import com.wordforge.data.WordDatabase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import com.wordforge.data.removeRetiredExerciseData
 import com.wordforge.notification.NotificationScheduler
 
@@ -16,15 +20,20 @@ class WordForgeApp : Application() {
         const val NOTIFICATION_CHANNEL_ID = "wordforge_review_alerts_v2"
     }
 
+    private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
     override fun onCreate() {
         super.onCreate()
         removeRetiredExerciseData(this)
         createNotificationChannel()
         NotificationScheduler.cancelLegacySchedules(this)
-        NotificationScheduler.ensureScheduled(
-            this,
-            NotificationPreferenceStore(this).reminderFrequency,
-        )
+        applicationScope.launch {
+            // Adding, reviewing, deleting and importing items all update the
+            // next instant reminder, including changes made outside a screen.
+            WordDatabase.getDatabase(this@WordForgeApp).wordDao().getAll().collect {
+                NotificationScheduler.scheduleNext(this@WordForgeApp)
+            }
+        }
     }
 
     private fun createNotificationChannel() {

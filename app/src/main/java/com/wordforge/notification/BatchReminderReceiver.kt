@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.content.ContextCompat
 import com.wordforge.data.NotificationPreferenceStore
+import com.wordforge.data.ReminderFrequency
 import com.wordforge.data.WordDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -29,18 +30,17 @@ class BatchReminderReceiver : BroadcastReceiver() {
             try {
                 val preferences = NotificationPreferenceStore(applicationContext)
 
-                // Schedule first so a process death while reading the database
-                // cannot break the reminder chain.
-                NotificationScheduler.ensureScheduled(
-                    applicationContext,
-                    preferences.reminderFrequency,
-                )
+                val now = System.currentTimeMillis()
+                val instant = preferences.reminderFrequency == ReminderFrequency.EVERY_NEW_WORD
+                val overdueItems = WordDatabase.getDatabase(applicationContext)
+                    .wordDao().getAllForNextPrompting(now)
+                val hasNewItems = !instant || overdueItems.any {
+                    it.nextPromptAt > preferences.lastInstantReminderAt
+                }
+                if (instant) preferences.lastInstantReminderAt = now
+                NotificationScheduler.scheduleNext(applicationContext)
 
-                if (hasNotificationPermission(applicationContext)) {
-                    val overdueItems = WordDatabase
-                        .getDatabase(applicationContext)
-                        .wordDao()
-                        .getAllForNextPrompting(System.currentTimeMillis())
+                if (hasNewItems && hasNotificationPermission(applicationContext)) {
                     ReviewNotification.show(applicationContext, overdueItems)
                 }
             } finally {

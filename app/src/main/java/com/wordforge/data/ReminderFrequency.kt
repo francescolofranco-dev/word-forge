@@ -1,7 +1,7 @@
 package com.wordforge.data
 
 /**
- * The number of grouped review reminders WordForge may show each day.
+ * Review reminder limits; zero means every newly due item with no daily cap.
  * Slots are intentionally spread across normal waking hours.
  */
 enum class ReminderFrequency(
@@ -23,6 +23,10 @@ enum class ReminderFrequency(
     FIVE_TIMES(
         notificationsPerDay = 5,
         slotHours = listOf(9, 12, 15, 18, 21),
+    ),
+    EVERY_NEW_WORD(
+        notificationsPerDay = 0,
+        slotHours = emptyList(),
     );
 
     companion object {

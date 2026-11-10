@@ -4,6 +4,8 @@ WordForge is an offline-first Android vocabulary and language trainer built with
 
 ## Features
 
+- **Quick setup:** A three-step walkthrough introduces adding items and active recall, then sets the reminder limit and requests notification permission. It appears until completed, including for existing installs after updating.
+- **Review reminders:** Choose at most 1, 2, 3, or 5 grouped reminders per day, or “Every new word” for uncapped reminders when another item becomes due. Android may delay background alarms.
 - **Spaced Repetition System (SRS):** Schedules word reviews across 9 adaptive learning tiers (from newly added to mastered) based on active recall performance.
 - **Vocabulary & Verb Conjugations:** Save custom words and complete verb conjugation tables with definitions, notes, and examples.
 - **Active Recall Quizzes:** Practice with interactive flashcard-style quizzes and instant self-assessment.
@@ -15,7 +17,7 @@ WordForge is an offline-first Android vocabulary and language trainer built with
 
 - Kotlin & Jetpack Compose
 - Room Database (offline-first architecture)
-- WorkManager (scheduled review reminders)
+- AlarmManager (review reminders at daily slots or item due times)
 - Downloadable Fonts (Google Fonts API with offline fallback)
 - Gradle Play Publisher (automated Play Store deployment)
 
@@ -24,7 +26,10 @@ WordForge is an offline-first Android vocabulary and language trainer built with
 ```sh
 ./gradlew testDebugUnitTest
 ./gradlew lintDebug
-./gradlew assembleDebug
+./gradlew assembleBenchmark
+# Optimized, non-debuggable, profileable, debug-key-signed APK:
+# app/build/outputs/apk/benchmark/app-benchmark.apk
+# This is performance-ready; no benchmark measurements are implied.
 ```
 
 ### Play Store release

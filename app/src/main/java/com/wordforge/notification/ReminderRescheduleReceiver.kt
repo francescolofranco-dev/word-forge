@@ -3,17 +3,24 @@ package com.wordforge.notification
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.wordforge.data.NotificationPreferenceStore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 
 /** Restores the next alarm after a reboot, app update, or wall-clock change. */
 class ReminderRescheduleReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action !in SUPPORTED_ACTIONS) return
 
-        NotificationScheduler.ensureScheduled(
-            context.applicationContext,
-            NotificationPreferenceStore(context).reminderFrequency,
-        )
+        val pendingResult = goAsync()
+        CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
+            try {
+                NotificationScheduler.scheduleNext(context.applicationContext)
+            } finally {
+                pendingResult.finish()
+            }
+        }
     }
 
     private companion object {
