@@ -16,6 +16,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -43,6 +44,7 @@ fun WordCard(
     modifier: Modifier = Modifier,
     typeLabel: String? = null,
     onLongClick: (() -> Unit)? = null,
+    onEdit: (() -> Unit)? = null,
     onDelete: (() -> Unit)? = null,
 ) {
     var menuOpen by remember { mutableStateOf(false) }
@@ -81,7 +83,7 @@ fun WordCard(
                         softWrap = false,
                         overflow = TextOverflow.Ellipsis,
                     )
-                    if (onDelete != null) {
+                    if (onEdit != null || onDelete != null) {
                         Box {
                             IconButton(
                                 onClick = { menuOpen = true },
@@ -93,25 +95,42 @@ fun WordCard(
                                 expanded = menuOpen,
                                 onDismissRequest = { menuOpen = false },
                             ) {
-                                DropdownMenuItem(
-                                    text = {
-                                        Text(
-                                            "Delete item",
-                                            color = MaterialTheme.colorScheme.error,
-                                        )
-                                    },
-                                    leadingIcon = {
-                                        Icon(
-                                            Icons.Rounded.Delete,
-                                            contentDescription = null,
-                                            tint = MaterialTheme.colorScheme.error,
-                                        )
-                                    },
-                                    onClick = {
-                                        menuOpen = false
-                                        onDelete()
-                                    },
-                                )
+                                if (onEdit != null) {
+                                    DropdownMenuItem(
+                                        text = { Text("Edit item") },
+                                        leadingIcon = {
+                                            Icon(
+                                                Icons.Rounded.Edit,
+                                                contentDescription = null,
+                                            )
+                                        },
+                                        onClick = {
+                                            menuOpen = false
+                                            onEdit()
+                                        },
+                                    )
+                                }
+                                if (onDelete != null) {
+                                    DropdownMenuItem(
+                                        text = {
+                                            Text(
+                                                "Delete item",
+                                                color = MaterialTheme.colorScheme.error,
+                                            )
+                                        },
+                                        leadingIcon = {
+                                            Icon(
+                                                Icons.Rounded.Delete,
+                                                contentDescription = null,
+                                                tint = MaterialTheme.colorScheme.error,
+                                            )
+                                        },
+                                        onClick = {
+                                            menuOpen = false
+                                            onDelete()
+                                        },
+                                    )
+                                }
                             }
                         }
                     }
@@ -162,6 +181,7 @@ private fun WordCardPreview() {
             dueLabel = "57m 53s",
             typeLabel = "PRETÉRITO PERFECTO SIMPLE",
             onClick = {},
+            onEdit = {},
             onDelete = {},
             modifier = Modifier.padding(16.dp),
         )

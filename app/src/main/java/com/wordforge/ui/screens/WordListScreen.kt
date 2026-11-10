@@ -98,6 +98,7 @@ fun WordListScreen(
     onNavigateToDetail: (String) -> Unit,
     onNavigateToHowItWorks: () -> Unit,
     onNavigateToOverdueReview: () -> Unit,
+    onNavigateToEdit: (String) -> Unit,
     themeMode: ThemeMode,
     onThemeModeChange: (ThemeMode) -> Unit,
     reminderFrequency: ReminderFrequency,
@@ -381,6 +382,7 @@ fun WordListScreen(
                             word = word,
                             now = now,
                             onClick = { onNavigateToDetail(word.id) },
+                            onEdit = { onNavigateToEdit(word.id) },
                             onDelete = { wordToDelete = word },
                             modifier = Modifier.animateItem(),
                         )
@@ -402,6 +404,7 @@ fun WordListScreen(
                             word = word,
                             now = now,
                             onClick = { onNavigateToDetail(word.id) },
+                            onEdit = { onNavigateToEdit(word.id) },
                             onDelete = { wordToDelete = word },
                             modifier = Modifier.animateItem(),
                         )
@@ -582,6 +585,7 @@ private fun UpcomingWordCard(
     word: Word,
     now: Long,
     onClick: () -> Unit,
+    onEdit: () -> Unit,
     onDelete: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -592,6 +596,7 @@ private fun UpcomingWordCard(
         dueLabel = formatCompactDue(word.nextPromptAt, now),
         typeLabel = listTypeLabel(word),
         onClick = onClick,
+        onEdit = onEdit,
         onDelete = onDelete,
         modifier = modifier,
     )

@@ -54,6 +54,9 @@ fun NavGraph(
                 onNavigateToOverdueReview = {
                     navController.navigate(Screen.OverdueReview.route)
                 },
+                onNavigateToEdit = { wordId ->
+                    navController.navigate(Screen.EditWord.createRoute(wordId))
+                },
                 themeMode = themeMode,
                 onThemeModeChange = onThemeModeChange,
                 reminderFrequency = reminderFrequency,
