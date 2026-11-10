@@ -30,7 +30,7 @@ import com.wordforge.data.ThemePreferenceStore
 import com.wordforge.data.NotificationPreferenceStore
 import com.wordforge.notification.NotificationScheduler
 import com.wordforge.notification.ReviewNotification
-import com.wordforge.ui.screens.OnboardingScreen
+import com.wordforge.ui.screens.OnboardingDialog
 import com.wordforge.ui.navigation.NavGraph
 import com.wordforge.ui.navigation.Screen
 import com.wordforge.ui.theme.WordForgeTheme
@@ -87,20 +87,7 @@ class MainActivity : ComponentActivity() {
                         notificationPreferenceStore.reminderFrequency = selected
                         NotificationScheduler.reschedule(applicationContext)
                     }
-                    if (!onboardingComplete) {
-                        OnboardingScreen(
-                            reminderFrequency = reminderFrequency,
-                            onReminderFrequencyChange = changeFrequency,
-                            notificationsGranted = notificationsGranted,
-                            onRequestNotificationPermission = ::requestNotificationPermission,
-                            onComplete = {
-                                notificationPreferenceStore.hasCompletedOnboarding = true
-                                notificationPreferenceStore.hasShownEducation = true
-                                hasShownNotificationEducation = true
-                                onboardingComplete = true
-                            },
-                        )
-                    } else NavGraph(
+                    NavGraph(
                         navController = navController,
                         themeMode = themeMode,
                         onThemeModeChange = { selectedThemeMode ->
@@ -118,6 +105,21 @@ class MainActivity : ComponentActivity() {
                         },
                         onRequestNotificationPermission = ::requestNotificationPermission,
                     )
+
+                    if (!onboardingComplete) {
+                        OnboardingDialog(
+                            reminderFrequency = reminderFrequency,
+                            onReminderFrequencyChange = changeFrequency,
+                            notificationsGranted = notificationsGranted,
+                            onRequestNotificationPermission = ::requestNotificationPermission,
+                            onComplete = {
+                                notificationPreferenceStore.hasCompletedOnboarding = true
+                                notificationPreferenceStore.hasShownEducation = true
+                                hasShownNotificationEducation = true
+                                onboardingComplete = true
+                            },
+                        )
+                    }
 
                     LaunchedEffect(pendingWordId, pendingOverdueReview, onboardingComplete) {
                         if (!onboardingComplete) return@LaunchedEffect
