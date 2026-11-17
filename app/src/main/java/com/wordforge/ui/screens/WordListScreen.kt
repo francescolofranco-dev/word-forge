@@ -30,9 +30,11 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.HelpOutline
 import androidx.compose.material.icons.rounded.BarChart
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.DarkMode
 import androidx.compose.material.icons.rounded.DeleteSweep
 import androidx.compose.material.icons.rounded.FolderOpen
@@ -40,14 +42,17 @@ import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material.icons.rounded.NotificationsActive
 import androidx.compose.material.icons.rounded.SaveAlt
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarResult
@@ -65,6 +70,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -73,6 +79,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.wordforge.R
 import com.wordforge.data.LearningItemType
@@ -96,6 +103,48 @@ import java.time.temporal.ChronoUnit
 import java.util.Locale
 import kotlin.time.Duration.Companion.seconds
 
+@Composable
+internal fun WordListFilters(
+    query: String,
+    selectedType: LearningItemType?,
+    onQueryChange: (String) -> Unit,
+    onTypeChange: (LearningItemType?) -> Unit,
+) {
+    OutlinedTextField(
+        value = query,
+        onValueChange = onQueryChange,
+        label = { Text("Search items") },
+        leadingIcon = { Icon(Icons.Rounded.Search, contentDescription = null) },
+        trailingIcon = {
+            if (query.isNotEmpty()) {
+                IconButton(onClick = { onQueryChange("") }) {
+                    Icon(Icons.Rounded.Close, contentDescription = "Clear search")
+                }
+            }
+        },
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+        modifier = Modifier.fillMaxWidth(),
+    )
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        FilterChip(
+            selected = selectedType == null,
+            onClick = { onTypeChange(null) },
+            label = { Text("All") },
+        )
+        FilterChip(
+            selected = selectedType == LearningItemType.SIMPLE_WORD,
+            onClick = { onTypeChange(LearningItemType.SIMPLE_WORD) },
+            label = { Text("Words") },
+        )
+        FilterChip(
+            selected = selectedType == LearningItemType.VERB_CONJUGATION,
+            onClick = { onTypeChange(LearningItemType.VERB_CONJUGATION) },
+            label = { Text("Verbs") },
+        )
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WordListScreen(
@@ -114,6 +163,13 @@ fun WordListScreen(
     onRequestNotificationPermission: () -> Unit,
 ) {
     val words by viewModel.allWords.collectAsStateWithLifecycle()
+
+    var searchQuery by rememberSaveable { mutableStateOf("") }
+    var typeFilter by rememberSaveable { mutableStateOf<LearningItemType?>(null) }
+    val filteredWords = remember(words, searchQuery, typeFilter) {
+        filterWords(words, searchQuery, typeFilter)
+    }
+    val filtersActive = searchQuery.isNotBlank() || typeFilter != null
 
     var wordToDelete by remember { mutableStateOf<Word?>(null) }
     var showDeleteAllDialog1 by remember { mutableStateOf(false) }
@@ -353,72 +409,114 @@ fun WordListScreen(
                     .padding(innerPadding)
             )
         } else {
-            val overdueWords = words.filter { it.nextPromptAt <= now }.sortedBy { it.nextPromptAt }
+            val overdueWords = filteredWords.filter { it.nextPromptAt <= now }.sortedBy { it.nextPromptAt }
             val overdueCount = overdueWords.size
-            val upcoming = words.filter { it.nextPromptAt > now }
+            val upcoming = filteredWords.filter { it.nextPromptAt > now }
             val upcomingSections = groupUpcomingWords(upcoming, now)
 
-            LazyColumn(
-                state = listState,
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
                     .padding(horizontal = 20.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                if (overdueCount > 0) {
-                    item {
-                        OverdueCard(
-                            count = overdueCount,
-                            onClick = onNavigateToOverdueReview,
-                            modifier = Modifier.padding(top = 4.dp),
-                        )
-                    }
-
-                    item(key = "section_ready") {
-                        Text(
-                            text = "Ready for review",
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(top = 12.dp, bottom = 4.dp),
-                        )
-                    }
-
-                    items(overdueWords, key = { it.id }) { word ->
-                        UpcomingWordCard(
-                            word = word,
-                            now = now,
-                            onClick = { onNavigateToDetail(word.id) },
-                            onEdit = { onNavigateToEdit(word.id) },
-                            onDelete = { wordToDelete = word },
-                            modifier = Modifier.animateItem(),
-                        )
-                    }
+                WordListFilters(
+                    query = searchQuery,
+                    selectedType = typeFilter,
+                    onQueryChange = {
+                        searchQuery = it
+                        scope.launch { listState.scrollToItem(0) }
+                    },
+                    onTypeChange = {
+                        typeFilter = it
+                        scope.launch { listState.scrollToItem(0) }
+                    },
+                )
+                if (filtersActive) {
+                    Text(
+                        text = "${filteredWords.size} of ${words.size} items",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(bottom = 8.dp),
+                    )
                 }
+                LazyColumn(
+                    state = listState,
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    if (filteredWords.isEmpty()) {
+                        item(key = "no_matches") {
+                            Column(
+                                modifier = Modifier.fillMaxWidth().padding(vertical = 32.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                            ) {
+                                Text("No matching items", style = MaterialTheme.typography.titleMedium)
+                                Text(
+                                    "Try another search or type.",
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                                TextButton(onClick = {
+                                    searchQuery = ""
+                                    typeFilter = null
+                                }) { Text("Clear filters") }
+                            }
+                        }
+                    }
+                    if (overdueCount > 0) {
+                        if (!filtersActive) item {
+                            OverdueCard(
+                                count = overdueCount,
+                                onClick = onNavigateToOverdueReview,
+                                modifier = Modifier.padding(top = 4.dp),
+                            )
+                        }
 
-                upcomingSections.forEach { (section, sectionWords) ->
-                    item(key = "section_$section") {
-                        Text(
-                            text = section,
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(top = 12.dp, bottom = 4.dp),
-                        )
+                        item(key = "section_ready") {
+                            Text(
+                                text = "Ready for review",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(top = 12.dp, bottom = 4.dp),
+                            )
+                        }
+
+                        items(overdueWords, key = { it.id }) { word ->
+                            UpcomingWordCard(
+                                word = word,
+                                now = now,
+                                onClick = { onNavigateToDetail(word.id) },
+                                onEdit = { onNavigateToEdit(word.id) },
+                                onDelete = { wordToDelete = word },
+                                modifier = Modifier.animateItem(),
+                            )
+                        }
                     }
 
-                    items(sectionWords, key = { it.id }) { word ->
-                        UpcomingWordCard(
-                            word = word,
-                            now = now,
-                            onClick = { onNavigateToDetail(word.id) },
-                            onEdit = { onNavigateToEdit(word.id) },
-                            onDelete = { wordToDelete = word },
-                            modifier = Modifier.animateItem(),
-                        )
+                    upcomingSections.forEach { (section, sectionWords) ->
+                        item(key = "section_$section") {
+                            Text(
+                                text = section,
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(top = 12.dp, bottom = 4.dp),
+                            )
+                        }
+
+                        items(sectionWords, key = { it.id }) { word ->
+                            UpcomingWordCard(
+                                word = word,
+                                now = now,
+                                onClick = { onNavigateToDetail(word.id) },
+                                onEdit = { onNavigateToEdit(word.id) },
+                                onDelete = { wordToDelete = word },
+                                modifier = Modifier.animateItem(),
+                            )
+                        }
                     }
+
+                    item { Spacer(modifier = Modifier.height(96.dp)) }
                 }
-
-                item { Spacer(modifier = Modifier.height(96.dp)) }
             }
         }
     }
