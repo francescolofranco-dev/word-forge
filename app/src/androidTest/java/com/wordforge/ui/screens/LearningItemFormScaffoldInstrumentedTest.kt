@@ -1,6 +1,8 @@
 package com.wordforge.ui.screens
 
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -21,6 +23,30 @@ class LearningItemFormScaffoldInstrumentedTest {
 
     @get:Rule
     val composeRule = createComposeRule()
+
+    @Test
+    fun emptyFutureTenseFormsUseNeutralHints() {
+        composeRule.setContent {
+            WordForgeTheme {
+                LearningItemFormScaffold(
+                    topBarLabel = "EDIT ITEM",
+                    headline = "Refine your entry.",
+                    subtitle = "",
+                    submitLabel = "Save changes",
+                    onSubmit = {},
+                    onNavigateBack = {},
+                    initialDraft = LearningItemDraft(
+                        type = LearningItemType.VERB_CONJUGATION,
+                        term = "decir",
+                        verbConjugation = VerbConjugation.Empty.copy(tense = "futuro simple"),
+                    ),
+                    allowTypeSelection = false,
+                )
+            }
+        }
+
+        composeRule.onAllNodesWithText("Enter form").assertCountEquals(6)
+    }
 
     @Test
     fun editingAVerbUsesTheFixedTenseDropdownWithoutMeaning() {

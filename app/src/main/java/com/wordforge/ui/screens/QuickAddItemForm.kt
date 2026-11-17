@@ -737,7 +737,7 @@ fun QuickAddItemForm(
                         value = pasteInput,
                         onValueChange = { pasteInput = it },
                         label = "Six forms in person order",
-                        placeholder = "digo, dices, dice, decimos, decís, dicen",
+                        placeholder = "form 1, form 2, form 3, form 4, form 5, form 6",
                         isError = pasteValidationAttempted &&
                             pasteInput.isNotBlank() &&
                             parseSixConjugationForms(pasteInput) == null,
@@ -798,7 +798,7 @@ fun QuickAddItemForm(
                         yo = it
                         pasteApplied = false
                     },
-                    placeholder = "digo",
+                    placeholder = "Enter form",
                     showError = conjugationValidationAttempted && yo.isBlank(),
                     focusRequester = yoFocusRequester,
                     onFocused = { focusTargetName = QuickAddFocus.YO.name },
@@ -811,7 +811,7 @@ fun QuickAddItemForm(
                         tu = it
                         pasteApplied = false
                     },
-                    placeholder = "dices",
+                    placeholder = "Enter form",
                     showError = conjugationValidationAttempted && tu.isBlank(),
                     focusRequester = tuFocusRequester,
                     onFocused = { focusTargetName = QuickAddFocus.TU.name },
@@ -824,7 +824,7 @@ fun QuickAddItemForm(
                         elEllaUsted = it
                         pasteApplied = false
                     },
-                    placeholder = "dice",
+                    placeholder = "Enter form",
                     showError = conjugationValidationAttempted && elEllaUsted.isBlank(),
                     focusRequester = elEllaUstedFocusRequester,
                     onFocused = { focusTargetName = QuickAddFocus.EL_ELLA_USTED.name },
@@ -837,7 +837,7 @@ fun QuickAddItemForm(
                         nosotros = it
                         pasteApplied = false
                     },
-                    placeholder = "decimos",
+                    placeholder = "Enter form",
                     showError = conjugationValidationAttempted && nosotros.isBlank(),
                     focusRequester = nosotrosFocusRequester,
                     onFocused = { focusTargetName = QuickAddFocus.NOSOTROS.name },
@@ -850,7 +850,7 @@ fun QuickAddItemForm(
                         vosotros = it
                         pasteApplied = false
                     },
-                    placeholder = "decís",
+                    placeholder = "Enter form",
                     showError = conjugationValidationAttempted && vosotros.isBlank(),
                     focusRequester = vosotrosFocusRequester,
                     onFocused = { focusTargetName = QuickAddFocus.VOSOTROS.name },
@@ -863,7 +863,7 @@ fun QuickAddItemForm(
                         ellosEllasUstedes = it
                         pasteApplied = false
                     },
-                    placeholder = "dicen",
+                    placeholder = "Enter form",
                     showError = conjugationValidationAttempted && ellosEllasUstedes.isBlank(),
                     focusRequester = ellosEllasUstedesFocusRequester,
                     onFocused = {
