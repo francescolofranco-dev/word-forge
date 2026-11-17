@@ -411,6 +411,10 @@ fun QuickAddItemForm(
         if (missingConjugation != null) {
             verbStageName = VerbAddStage.CONJUGATION.name
             requestFocus(missingConjugation)
+            scope.launch {
+                snackbarHostState.currentSnackbarData?.dismiss()
+                snackbarHostState.showSnackbar("Fill in all six forms")
+            }
             return
         }
         commit(currentDraftValue())
