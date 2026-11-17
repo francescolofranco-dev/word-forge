@@ -1,9 +1,12 @@
 package com.wordforge.ui.screens
 
+import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -22,6 +25,9 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -547,7 +553,10 @@ private fun AboutDialog(onDismiss: () -> Unit) {
         onDismissRequest = onDismiss,
         title = { Text("About WordForge") },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(
+                modifier = Modifier.verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
                 Text(
                     text = "Turn new words into long-term memory through spaced repetition.",
                     style = MaterialTheme.typography.bodyMedium,
@@ -557,6 +566,37 @@ private fun AboutDialog(onDismiss: () -> Unit) {
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
+                TextButton(onClick = {
+                    try {
+                        context.startActivity(Intent(
+                            Intent.ACTION_VIEW,
+                            Uri.parse("https://francescolofranco-dev.github.io/word-forge/privacy_policy.html"),
+                        ))
+                    } catch (_: ActivityNotFoundException) {
+                        Toast.makeText(context, "Install a browser to view the privacy policy.", Toast.LENGTH_LONG).show()
+                    }
+                }) {
+                    Text("Privacy policy")
+                }
+                TextButton(onClick = {
+                    try {
+                        context.startActivity(Intent(
+                            Intent.ACTION_SENDTO,
+                            Uri.fromParts("mailto", "lofrancofrancesco@gmail.com", null),
+                        ).putExtra(Intent.EXTRA_SUBJECT, "WordForge feedback"))
+                    } catch (_: ActivityNotFoundException) {
+                        Toast.makeText(context, "No email app installed. Copy the address below to contact the developer.", Toast.LENGTH_LONG).show()
+                    }
+                }) {
+                    Text("Contact developer")
+                }
+                SelectionContainer {
+                    Text(
+                        text = "lofrancofrancesco@gmail.com",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
         },
         confirmButton = {
