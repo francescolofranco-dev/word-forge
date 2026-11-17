@@ -68,7 +68,7 @@ fun OverdueCard(
                     style = MaterialTheme.typography.headlineMedium,
                 )
                 Text(
-                    text = "Tap to review them all",
+                    text = if (count == 1) "Tap to review it" else "Tap to review them all",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.85f),
                 )
