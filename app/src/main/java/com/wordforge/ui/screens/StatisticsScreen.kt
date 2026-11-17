@@ -88,7 +88,10 @@ fun StatisticsScreen(words: List<Word>, onNavigateBack: () -> Unit) {
             item {
                 ChartCard(
                     "Review results",
-                    stats.accuracyPercent?.let { "$it% correct · ${stats.totalAnswers} answers" }
+                    stats.accuracyPercent?.let {
+                        val answerLabel = if (stats.totalAnswers == 1L) "answer" else "answers"
+                        "$it% correct · ${stats.totalAnswers} $answerLabel"
+                    }
                         ?: "No reviews yet · answer a review to get started",
                 ) {
                     ChartBar("Correct", stats.correct, stats.totalAnswers.coerceAtLeast(1))
