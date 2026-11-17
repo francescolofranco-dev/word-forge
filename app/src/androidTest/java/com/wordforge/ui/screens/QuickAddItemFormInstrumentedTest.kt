@@ -2,12 +2,14 @@ package com.wordforge.ui.screens
 
 import androidx.compose.ui.test.assertIsFocused
 import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performImeAction
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTextReplacement
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -106,6 +108,32 @@ class QuickAddItemFormInstrumentedTest {
             assertEquals("hello", submitted?.meaning)
         }
         composeRule.onNodeWithTag("quick_add_term").assertIsFocused()
+    }
+
+    @Test
+    fun futureTenseUsesNeutralHintsForEveryPersonAndPaste() {
+        composeRule.setContent {
+            WordForgeTheme {
+                QuickAddItemForm(onSubmit = {}, onNavigateBack = {})
+            }
+        }
+
+        composeRule.onNodeWithTag("quick_add_type_verb_conjugation").performClick()
+        composeRule.onNodeWithTag("quick_add_term").performTextInput("decir")
+        composeRule.onNodeWithTag("quick_add_term").performImeAction()
+        composeRule.onNodeWithTag("verb_tense_option_3").performClick()
+        composeRule.onNodeWithText("futuro simple").assertExists()
+
+        listOf(
+            "YO", "TÚ", "ÉL / ELLA / USTED", "NOSOTROS / AS",
+            "VOSOTROS / AS", "ELLOS / ELLAS / UDS.",
+        ).forEach { person ->
+            composeRule.onNodeWithContentDescription("$person conjugation")
+                .assertTextContains("Enter form")
+        }
+        composeRule.onNodeWithText("Paste all 6 forms").performScrollTo().performClick()
+        composeRule.onNodeWithTag("quick_add_paste")
+            .assertTextContains("form 1, form 2, form 3, form 4, form 5, form 6")
     }
 
     @Test

@@ -364,42 +364,42 @@ fun LearningItemFormScaffold(
 
                 ConjugationField(
                     person = "YO",
-                    placeholder = "e.g. digo",
+                    placeholder = "Enter form",
                     value = yo,
                     onValueChange = { yo = it },
                     showError = validationAttempted && yo.isBlank(),
                 )
                 ConjugationField(
                     person = "TÚ",
-                    placeholder = "e.g. dices",
+                    placeholder = "Enter form",
                     value = tu,
                     onValueChange = { tu = it },
                     showError = validationAttempted && tu.isBlank(),
                 )
                 ConjugationField(
                     person = "ÉL / ELLA / USTED",
-                    placeholder = "e.g. dice",
+                    placeholder = "Enter form",
                     value = elEllaUsted,
                     onValueChange = { elEllaUsted = it },
                     showError = validationAttempted && elEllaUsted.isBlank(),
                 )
                 ConjugationField(
                     person = "NOSOTROS / NOSOTRAS",
-                    placeholder = "e.g. decimos",
+                    placeholder = "Enter form",
                     value = nosotros,
                     onValueChange = { nosotros = it },
                     showError = validationAttempted && nosotros.isBlank(),
                 )
                 ConjugationField(
                     person = "VOSOTROS / VOSOTRAS",
-                    placeholder = "e.g. decís",
+                    placeholder = "Enter form",
                     value = vosotros,
                     onValueChange = { vosotros = it },
                     showError = validationAttempted && vosotros.isBlank(),
                 )
                 ConjugationField(
                     person = "ELLOS / ELLAS / USTEDES",
-                    placeholder = "e.g. dicen",
+                    placeholder = "Enter form",
                     value = ellosEllasUstedes,
                     onValueChange = { ellosEllasUstedes = it },
                     showError = validationAttempted && ellosEllasUstedes.isBlank(),
