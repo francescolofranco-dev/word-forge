@@ -89,6 +89,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.IOException
 import java.time.Instant
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
@@ -154,12 +155,12 @@ fun WordListScreen(
                 val json = withContext(Dispatchers.IO) {
                     context.contentResolver.openInputStream(uri)
                         ?.bufferedReader()?.use { it.readText() }
-                } ?: return@launch
+                } ?: throw IOException("No input stream for selected backup")
                 importPreview = withContext(Dispatchers.Default) {
                     viewModel.previewImport(json)
                 }
             } catch (t: Throwable) {
-                snackbarHostState.showSnackbar("Import failed: ${t.message ?: "unknown error"}")
+                snackbarHostState.showSnackbar(importErrorMessage(t))
             }
         }
     }
@@ -506,7 +507,7 @@ fun WordListScreen(
                                 snackbarHostState.showSnackbar("Imported $count items")
                             } catch (t: Throwable) {
                                 snackbarHostState.showSnackbar(
-                                    "Import failed: ${t.message ?: "unknown error"}"
+                                    importErrorMessage(t)
                                 )
                             }
                         }
