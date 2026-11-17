@@ -372,8 +372,16 @@ fun QuickAddItemForm(
 
     fun commit(draft: LearningItemDraft) {
         if (submitLocked) return
-        submitLocked = true
         val normalized = draft.normalized()
+        // Keyboard Done reaches this handler even when the Add button is disabled.
+        if (itemWarning(normalized) != null ||
+            sessionDuplicateWarning(normalized, submittedThisSession) != null
+        ) {
+            verbStageName = VerbAddStage.BASICS.name
+            requestFocus(QuickAddFocus.TERM)
+            return
+        }
+        submitLocked = true
         submittedThisSession.add(normalized)
         onSubmit(normalized)
         addedCount += 1
@@ -573,7 +581,8 @@ fun QuickAddItemForm(
                     } else {
                         "e.g. petrichor"
                     },
-                    isError = baseValidationAttempted && term.isBlank(),
+                    isError = (baseValidationAttempted && term.isBlank()) ||
+                        (duplicateWarning != null && selectedType == LearningItemType.SIMPLE_WORD),
                     supportingText = when {
                         baseValidationAttempted && term.isBlank() -> {
                             if (selectedType == LearningItemType.VERB_CONJUGATION) {
@@ -642,7 +651,7 @@ fun QuickAddItemForm(
                     Spacer(modifier = Modifier.height(24.dp))
                     Button(
                         onClick = { submitSimpleWord() },
-                        enabled = !submitLocked,
+                        enabled = !submitLocked && duplicateWarning == null,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(56.dp),
@@ -658,7 +667,7 @@ fun QuickAddItemForm(
                         onExpandedChange = { tenseMenuExpanded = it },
                         onTenseSelected = { openConjugation(it) },
                         label = "Tense or mood",
-                        isError = baseValidationAttempted && tense.isBlank(),
+                        isError = (baseValidationAttempted && tense.isBlank()) || duplicateWarning != null,
                         supportingText = when {
                             baseValidationAttempted && tense.isBlank() -> "Add the tense or mood"
                             duplicateWarning != null -> duplicateWarning
@@ -876,7 +885,7 @@ fun QuickAddItemForm(
                 Spacer(modifier = Modifier.height(18.dp))
                 Button(
                     onClick = { submitVerb() },
-                    enabled = !submitLocked,
+                    enabled = !submitLocked && duplicateWarning == null,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
