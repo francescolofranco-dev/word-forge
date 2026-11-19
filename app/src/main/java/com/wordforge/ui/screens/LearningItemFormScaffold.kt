@@ -204,7 +204,7 @@ fun LearningItemFormScaffold(
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = topBarLabel,
-                    style = MaterialTheme.typography.labelLarge,
+                    style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }

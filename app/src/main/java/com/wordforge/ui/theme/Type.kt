@@ -49,7 +49,7 @@ val Typography = Typography(
     bodyMedium     = TextStyle(fontFamily = Manrope,      fontWeight = FontWeight.W400, fontSize = 14.sp, lineHeight = 20.sp),
     bodySmall      = TextStyle(fontFamily = Manrope,      fontWeight = FontWeight.W400, fontSize = 13.sp, lineHeight = 18.sp),
 
-    labelLarge     = TextStyle(fontFamily = JetBrainsMono, fontWeight = FontWeight.W500, fontSize = 12.sp, lineHeight = 16.sp, letterSpacing = 1.5.sp),
+    labelLarge     = TextStyle(fontFamily = Manrope,       fontWeight = FontWeight.W600, fontSize = 14.sp, lineHeight = 20.sp),
     labelMedium    = TextStyle(fontFamily = JetBrainsMono, fontWeight = FontWeight.W500, fontSize = 11.sp, lineHeight = 14.sp, letterSpacing = 1.4.sp),
     labelSmall     = TextStyle(fontFamily = JetBrainsMono, fontWeight = FontWeight.W500, fontSize = 10.sp, lineHeight = 13.sp, letterSpacing = 0.4.sp),
 )

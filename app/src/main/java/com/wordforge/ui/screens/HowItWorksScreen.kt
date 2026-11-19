@@ -60,7 +60,7 @@ fun HowItWorksScreen(
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = "HOW IT WORKS",
-                    style = MaterialTheme.typography.labelLarge,
+                    style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }

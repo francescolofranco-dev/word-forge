@@ -478,7 +478,7 @@ fun QuickAddItemForm(
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = "QUICK ADD",
-                    style = MaterialTheme.typography.labelLarge,
+                    style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Spacer(modifier = Modifier.weight(1f))
