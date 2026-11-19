@@ -83,9 +83,9 @@ fun OverdueReviewScreen(
             TopAppBar(
                 title = {
                     val ids = queueIds
-                    if (ids != null && ids.isNotEmpty()) {
+                    if (ids != null && ids.isNotEmpty() && index < ids.size) {
                         Text(
-                            text = "Review ${(index + 1).coerceAtMost(ids.size)} / ${ids.size}",
+                            text = "Review ${index + 1} / ${ids.size}",
                             style = MaterialTheme.typography.titleLarge,
                         )
                     } else {
@@ -242,7 +242,11 @@ private fun AllDone(reviewed: Int, onFinished: () -> Unit) {
                 .background(wordForgeColors.correct),
             contentAlignment = Alignment.Center,
         ) {
-            SparksLogo(size = 68.dp)
+            SparksLogo(
+                size = 76.dp,
+                background = wordForgeColors.correct,
+                foreground = wordForgeColors.onCorrect,
+            )
         }
         Spacer(modifier = Modifier.height(28.dp))
         Text(

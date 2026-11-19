@@ -308,36 +308,32 @@ fun QuizContent(
                 shape = RoundedCornerShape(18.dp),
                 color = feedbackBg,
             ) {
-                Column(
+                Row(
                     modifier = Modifier
-                        .padding(20.dp)
+                        .padding(16.dp)
                         .fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .size(44.dp)
-                            .clip(CircleShape)
-                            .graphicsLayer { scaleX = 1f; scaleY = 1f },
-                        contentAlignment = Alignment.Center,
+                    Surface(
+                        shape = CircleShape,
+                        color = feedbackAccent,
+                        modifier = Modifier.size(36.dp),
                     ) {
-                        Surface(shape = CircleShape, color = feedbackAccent) {
-                            Box(Modifier.size(44.dp), contentAlignment = Alignment.Center) {
-                                Icon(
-                                    imageVector = feedbackIcon,
-                                    contentDescription = null,
-                                    tint = feedbackAccentContent,
-                                    modifier = Modifier.size(26.dp),
-                                )
-                            }
+                        Box(Modifier.size(36.dp), contentAlignment = Alignment.Center) {
+                            Icon(
+                                imageVector = feedbackIcon,
+                                contentDescription = null,
+                                tint = feedbackAccentContent,
+                                modifier = Modifier.size(20.dp),
+                            )
                         }
                     }
-                    Spacer(modifier = Modifier.height(10.dp))
                     Text(
                         text = feedbackText,
                         style = MaterialTheme.typography.titleMedium,
-                        textAlign = TextAlign.Center,
                         color = feedbackContent,
+                        modifier = Modifier.weight(1f),
                     )
                 }
             }

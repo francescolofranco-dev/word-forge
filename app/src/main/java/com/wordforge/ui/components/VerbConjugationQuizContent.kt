@@ -3,6 +3,7 @@ package com.wordforge.ui.components
 import android.os.Build
 import android.view.HapticFeedbackConstants
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -147,6 +148,10 @@ fun VerbConjugationQuizContent(
                         modifier = Modifier
                             .fillMaxWidth()
                             .defaultMinSize(minHeight = if (answered) 48.dp else 64.dp)
+                            .clickable(
+                                enabled = !isRevealed && !answered,
+                                onClick = { reveal(index) },
+                            )
                             .padding(start = 18.dp, end = 8.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
@@ -176,17 +181,22 @@ fun VerbConjugationQuizContent(
                             enabled = !isRevealed && !answered,
                         ) {
                             Icon(
-                                imageVector = Icons.Rounded.Visibility,
+                                imageVector = if (isRevealed) {
+                                    Icons.Rounded.Check
+                                } else {
+                                    Icons.Rounded.Visibility
+                                },
                                 contentDescription = if (isRevealed) {
                                     "${row.person} conjugation revealed"
                                 } else {
                                     "Reveal ${row.person} conjugation"
                                 },
                                 tint = if (isRevealed) {
-                                    MaterialTheme.colorScheme.primary
+                                    MaterialTheme.colorScheme.outline
                                 } else {
-                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                    MaterialTheme.colorScheme.primary
                                 },
+                                modifier = Modifier.size(if (isRevealed) 18.dp else 22.dp),
                             )
                         }
                     }
