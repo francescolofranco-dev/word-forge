@@ -33,6 +33,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.progressBarRangeInfo
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -50,7 +51,7 @@ fun OnboardingDialog(
     var step by rememberSaveable { mutableIntStateOf(0) }
     var requestedPermission by rememberSaveable { mutableStateOf(false) }
     var showSkipWarning by rememberSaveable { mutableStateOf(false) }
-    val maxHeight = LocalConfiguration.current.screenHeightDp.dp * 0.85f
+    val maxHeight = LocalConfiguration.current.screenHeightDp.dp * 0.92f
 
     Dialog(
         onDismissRequest = { if (step > 0) step-- },
@@ -71,7 +72,7 @@ fun OnboardingDialog(
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(10.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth().semantics {
                         progressBarRangeInfo = ProgressBarRangeInfo(
@@ -90,11 +91,11 @@ fun OnboardingDialog(
                         )
                     }
                 }
-                Spacer(Modifier.height(24.dp))
+                Spacer(Modifier.height(18.dp))
                 Column(
                     modifier = Modifier.weight(1f, fill = false)
                         .verticalScroll(rememberScrollState()),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     Text(
                         when (step) {
@@ -106,18 +107,30 @@ fun OnboardingDialog(
                     )
                     when (step) {
                         0 -> {
-                            Text("Save a word and its meaning, or a Spanish verb tense.",
-                                style = MaterialTheme.typography.bodyLarge)
+                            Text(
+                                "Save a word and its meaning, or a Spanish verb tense.",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
                         }
                         1 -> {
-                            Text("Recall the answer, then tap to reveal it.",
-                                style = MaterialTheme.typography.bodyLarge)
-                            Text("Words you miss come back sooner. Words you know wait longer.",
-                                style = MaterialTheme.typography.bodyLarge)
+                            Text(
+                                "Recall the answer, then tap to reveal it.",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                            Text(
+                                "Words you miss come back sooner. Words you know wait longer.",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
                         }
                         else -> {
-                            Text("Choose the maximum number of reminders per day, or hear whenever another item becomes due. Each notification groups the items ready to review.",
-                                style = MaterialTheme.typography.bodyLarge)
+                            Text(
+                                "Choose the maximum number of reminders per day, or hear whenever another item becomes due. Each notification groups the items ready to review.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
                             Column {
                                 ReminderFrequency.entries.forEach { frequency ->
                                     ReminderFrequencyOption(
@@ -127,19 +140,24 @@ fun OnboardingDialog(
                                     )
                                 }
                             }
-                            Text("Android may delay reminders to save battery. You can change this choice and enable notifications from the app menu anytime.",
-                                style = MaterialTheme.typography.bodySmall)
-                            if (notificationsGranted) {
-                                Text("Notifications are enabled. You’re ready to go.")
-                            } else if (requestedPermission) {
-                                Text("If notifications are blocked, you can enable them later from the app menu. You can still review anytime.")
-                            } else {
-                                Text("Next, allow Android notifications so WordForge can remind you when it’s time to review.")
-                            }
+                            Text(
+                                "Android may delay reminders to save battery. You can change this choice and enable notifications from the app menu anytime.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                            Text(
+                                when {
+                                    notificationsGranted -> "Notifications are enabled. You’re ready to go."
+                                    requestedPermission -> "If notifications are blocked, you can enable them later from the app menu. You can still review anytime."
+                                    else -> "Next, allow Android notifications so WordForge can remind you when it’s time to review."
+                                },
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
                         }
                     }
                 }
-                Spacer(Modifier.height(24.dp))
+                Spacer(Modifier.height(18.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -148,10 +166,12 @@ fun OnboardingDialog(
                         OutlinedButton(
                             onClick = { step-- },
                             modifier = Modifier.weight(1f).heightIn(min = 48.dp).fillMaxHeight(),
-                        ) { Text("Back") }
+                        ) {
+                            Text("Back", textAlign = TextAlign.Center)
+                        }
                     }
                     Button(
-                        modifier = Modifier.weight(if (step == 2) 2f else 1f)
+                        modifier = Modifier.weight(if (step == 2) 1.6f else 1f)
                             .heightIn(min = 48.dp).fillMaxHeight(),
                         onClick = {
                             when {
@@ -169,7 +189,8 @@ fun OnboardingDialog(
                                 step < 2 -> "Next"
                                 notificationsGranted || requestedPermission -> "Get started"
                                 else -> "Allow notifications"
-                            }
+                            },
+                            textAlign = TextAlign.Center,
                         )
                     }
                 }
