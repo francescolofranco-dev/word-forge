@@ -545,7 +545,7 @@ fun QuickAddItemForm(
                 )
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(14.dp))
             if (
                 selectedType != LearningItemType.VERB_CONJUGATION ||
                 verbStage == VerbAddStage.BASICS
@@ -561,7 +561,7 @@ fun QuickAddItemForm(
                         requestFocus(QuickAddFocus.TERM)
                     },
                 )
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(16.dp))
             }
 
             if (
@@ -617,7 +617,7 @@ fun QuickAddItemForm(
                 )
 
                 if (selectedType == LearningItemType.SIMPLE_WORD) {
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
                     QuickTextField(
                         value = meaning,
                         onValueChange = { meaning = it },
@@ -629,7 +629,7 @@ fun QuickAddItemForm(
                         } else {
                             null
                         },
-                        minLines = 3,
+                        minLines = 2,
                         singleLine = false,
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                         keyboardActions = KeyboardActions(onDone = { submitSimpleWord() }),
@@ -643,12 +643,12 @@ fun QuickAddItemForm(
                                 }
                             },
                     )
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
                     QuickRandomlyFlipToggle(
                         checked = randomlyFlip,
                         onCheckedChange = { randomlyFlip = it },
                     )
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
                     Button(
                         onClick = { submitSimpleWord() },
                         enabled = !submitLocked && duplicateWarning == null,
@@ -1003,23 +1003,34 @@ private fun QuickTextField(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
 ) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = { Text(label) },
-        placeholder = { Text(placeholder) },
-        isError = isError,
-        supportingText = supportingText?.let { text -> { Text(text) } },
-        minLines = minLines,
-        singleLine = singleLine,
-        keyboardOptions = keyboardOptions.copy(
-            capitalization = KeyboardCapitalization.None,
-        ),
-        keyboardActions = keyboardActions,
-        modifier = modifier,
-        shape = RoundedCornerShape(20.dp),
-        colors = quickFieldColors(),
-    )
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = label.uppercase(),
+            style = MaterialTheme.typography.labelMedium,
+            color = if (isError) {
+                MaterialTheme.colorScheme.error
+            } else {
+                MaterialTheme.colorScheme.onSurfaceVariant
+            },
+        )
+        Spacer(modifier = Modifier.height(6.dp))
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            placeholder = { Text(placeholder) },
+            isError = isError,
+            supportingText = supportingText?.let { text -> { Text(text) } },
+            minLines = minLines,
+            singleLine = singleLine,
+            keyboardOptions = keyboardOptions.copy(
+                capitalization = KeyboardCapitalization.None,
+            ),
+            keyboardActions = keyboardActions,
+            modifier = modifier,
+            shape = RoundedCornerShape(20.dp),
+            colors = quickFieldColors(),
+        )
+    }
 }
 
 @Composable
@@ -1119,7 +1130,7 @@ private fun QuickRandomlyFlipToggle(
 private fun quickFieldColors() = OutlinedTextFieldDefaults.colors(
     focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
     unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-    focusedBorderColor = Color.Transparent,
+    focusedBorderColor = MaterialTheme.colorScheme.primary,
     unfocusedBorderColor = Color.Transparent,
     cursorColor = MaterialTheme.colorScheme.primary,
 )

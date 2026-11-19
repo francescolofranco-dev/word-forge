@@ -384,21 +384,21 @@ fun LearningItemFormScaffold(
                     showError = validationAttempted && elEllaUsted.isBlank(),
                 )
                 ConjugationField(
-                    person = "NOSOTROS / NOSOTRAS",
+                    person = "NOSOTROS / AS",
                     placeholder = "Enter form",
                     value = nosotros,
                     onValueChange = { nosotros = it },
                     showError = validationAttempted && nosotros.isBlank(),
                 )
                 ConjugationField(
-                    person = "VOSOTROS / VOSOTRAS",
+                    person = "VOSOTROS / AS",
                     placeholder = "Enter form",
                     value = vosotros,
                     onValueChange = { vosotros = it },
                     showError = validationAttempted && vosotros.isBlank(),
                 )
                 ConjugationField(
-                    person = "ELLOS / ELLAS / USTEDES",
+                    person = "ELLOS / ELLAS / UDS.",
                     placeholder = "Enter form",
                     value = ellosEllasUstedes,
                     onValueChange = { ellosEllasUstedes = it },
@@ -543,23 +543,38 @@ private fun ConjugationField(
     imeAction: ImeAction = ImeAction.Next,
     onDone: (() -> Unit)? = null,
 ) {
-    FieldLabel(person)
-    Spacer(modifier = Modifier.height(8.dp))
-    FormTextField(
-        value = value,
-        onValueChange = onValueChange,
-        placeholder = placeholder,
-        isError = showError,
-        supportingText = if (showError) "Add this conjugation" else null,
-        keyboardOptions = KeyboardOptions(imeAction = imeAction),
-        keyboardActions = if (onDone != null) {
-            KeyboardActions(onDone = { onDone() })
-        } else {
-            KeyboardActions.Default
-        },
-        modifier = Modifier.fillMaxWidth(),
-    )
-    Spacer(modifier = Modifier.height(18.dp))
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        Text(
+            text = person,
+            modifier = Modifier.width(112.dp),
+            style = MaterialTheme.typography.labelSmall,
+            color = if (showError) {
+                MaterialTheme.colorScheme.error
+            } else {
+                MaterialTheme.colorScheme.onSurfaceVariant
+            },
+        )
+        FormTextField(
+            value = value,
+            onValueChange = onValueChange,
+            placeholder = placeholder,
+            isError = showError,
+            supportingText = if (showError) "Add this conjugation" else null,
+            keyboardOptions = KeyboardOptions(imeAction = imeAction),
+            keyboardActions = if (onDone != null) {
+                KeyboardActions(onDone = { onDone() })
+            } else {
+                KeyboardActions.Default
+            },
+            modifier = Modifier.weight(1f),
+        )
+    }
 }
 
 @Composable
@@ -612,7 +627,7 @@ private fun RandomlyFlipToggle(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "Randomly flip",
+                    text = "Quiz both directions",
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface,
                 )
@@ -646,7 +661,7 @@ private fun FieldLabel(text: String) {
 private fun filledFieldColors() = OutlinedTextFieldDefaults.colors(
     focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
     unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-    focusedBorderColor = Color.Transparent,
+    focusedBorderColor = MaterialTheme.colorScheme.primary,
     unfocusedBorderColor = Color.Transparent,
     cursorColor = MaterialTheme.colorScheme.primary,
 )

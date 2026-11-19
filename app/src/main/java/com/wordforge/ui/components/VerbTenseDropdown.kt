@@ -1,6 +1,9 @@
 package com.wordforge.ui.components
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -34,49 +37,62 @@ fun VerbTenseDropdown(
     shape: Shape = RoundedCornerShape(20.dp),
     testTag: String = "verb_tense_dropdown",
 ) {
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = onExpandedChange,
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        OutlinedTextField(
-            value = value,
-            onValueChange = {},
-            readOnly = true,
-            label = label?.let { text -> { Text(text) } },
-            placeholder = { Text("Choose a tense or mood") },
-            trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-            },
-            isError = isError,
-            supportingText = supportingText?.let { text -> { Text(text) } },
-            singleLine = true,
-            modifier = modifier
-                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
-                .testTag(testTag),
-            shape = shape,
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                focusedBorderColor = Color.Transparent,
-                unfocusedBorderColor = Color.Transparent,
-                cursorColor = MaterialTheme.colorScheme.primary,
-            ),
-        )
-
-        ExposedDropdownMenu(
+    Column(modifier = Modifier.fillMaxWidth()) {
+        if (label != null) {
+            Text(
+                text = label.uppercase(),
+                style = MaterialTheme.typography.labelMedium,
+                color = if (isError) {
+                    MaterialTheme.colorScheme.error
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                },
+            )
+            Spacer(modifier = Modifier.height(6.dp))
+        }
+        ExposedDropdownMenuBox(
             expanded = expanded,
-            onDismissRequest = { onExpandedChange(false) },
+            onExpandedChange = onExpandedChange,
+            modifier = Modifier.fillMaxWidth(),
         ) {
-            SupportedVerbTenses.forEachIndexed { index, tense ->
-                DropdownMenuItem(
-                    text = { Text(tense) },
-                    onClick = {
-                        onExpandedChange(false)
-                        onTenseSelected(tense)
-                    },
-                    modifier = Modifier.testTag("verb_tense_option_$index"),
-                )
+            OutlinedTextField(
+                value = value,
+                onValueChange = {},
+                readOnly = true,
+                placeholder = { Text("Choose a tense or mood") },
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                },
+                isError = isError,
+                supportingText = supportingText?.let { text -> { Text(text) } },
+                singleLine = true,
+                modifier = modifier
+                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
+                    .testTag(testTag),
+                shape = shape,
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = Color.Transparent,
+                    cursorColor = MaterialTheme.colorScheme.primary,
+                ),
+            )
+
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { onExpandedChange(false) },
+            ) {
+                SupportedVerbTenses.forEachIndexed { index, tense ->
+                    DropdownMenuItem(
+                        text = { Text(tense) },
+                        onClick = {
+                            onExpandedChange(false)
+                            onTenseSelected(tense)
+                        },
+                        modifier = Modifier.testTag("verb_tense_option_$index"),
+                    )
+                }
             }
         }
     }
