@@ -17,6 +17,8 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.unit.dp
 import com.wordforge.data.Word
 import com.wordforge.domain.wordStatistics
+import com.wordforge.ui.theme.LocalWordForgeColors
+import com.wordforge.ui.theme.TierColors
 import kotlinx.coroutines.delay
 import java.time.LocalDate
 import java.time.ZoneId
@@ -35,7 +37,9 @@ fun StatisticsScreen(words: List<Word>, onNavigateBack: () -> Unit) {
         }
     }
     val stats = remember(words, today, zone) { wordStatistics(words, today, zone) }
+    val wordForgeColors = LocalWordForgeColors.current
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 title = { Text("Statistics") },
@@ -44,6 +48,11 @@ fun StatisticsScreen(words: List<Word>, onNavigateBack: () -> Unit) {
                         Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Back")
                     }
                 },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
+                ),
             )
         },
     ) { padding ->
@@ -81,7 +90,8 @@ fun StatisticsScreen(words: List<Word>, onNavigateBack: () -> Unit) {
                 ChartCard("Learning progress", "Current items at each tier · 8 is the highest") {
                     val max = stats.tierCounts.max().coerceAtLeast(1).toLong()
                     stats.tierCounts.forEachIndexed { tier, count ->
-                        ChartBar("Tier $tier", count.toLong(), max)
+                        val tierColor = TierColors.getOrElse(tier) { TierColors.last() }
+                        ChartBar("Tier $tier", count.toLong(), max, color = tierColor)
                     }
                 }
             }
@@ -94,10 +104,17 @@ fun StatisticsScreen(words: List<Word>, onNavigateBack: () -> Unit) {
                     }
                         ?: "No reviews yet · answer a review to get started",
                 ) {
-                    ChartBar("Correct", stats.correct, stats.totalAnswers.coerceAtLeast(1))
                     ChartBar(
-                        "Incorrect", stats.incorrect, stats.totalAnswers.coerceAtLeast(1),
-                        color = MaterialTheme.colorScheme.tertiary,
+                        "Correct",
+                        stats.correct,
+                        stats.totalAnswers.coerceAtLeast(1),
+                        color = wordForgeColors.correct,
+                    )
+                    ChartBar(
+                        "Incorrect",
+                        stats.incorrect,
+                        stats.totalAnswers.coerceAtLeast(1),
+                        color = wordForgeColors.incorrect,
                     )
                 }
             }
