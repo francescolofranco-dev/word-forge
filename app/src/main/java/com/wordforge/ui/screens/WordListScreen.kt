@@ -53,6 +53,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarResult
@@ -113,7 +114,7 @@ internal fun WordListFilters(
     OutlinedTextField(
         value = query,
         onValueChange = onQueryChange,
-        label = { Text("Search items") },
+        placeholder = { Text("Search items") },
         leadingIcon = { Icon(Icons.Rounded.Search, contentDescription = null) },
         trailingIcon = {
             if (query.isNotEmpty()) {
@@ -124,8 +125,17 @@ internal fun WordListFilters(
         },
         singleLine = true,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+        shape = RoundedCornerShape(20.dp),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = Color.Transparent,
+            cursorColor = MaterialTheme.colorScheme.primary,
+        ),
         modifier = Modifier.fillMaxWidth(),
     )
+    Spacer(modifier = Modifier.height(8.dp))
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         FilterChip(
             selected = selectedType == null,
@@ -143,6 +153,7 @@ internal fun WordListFilters(
             label = { Text("Verbs") },
         )
     }
+    Spacer(modifier = Modifier.height(4.dp))
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -232,6 +243,9 @@ fun WordListScreen(
 
     val listState = rememberLazyListState()
     val fabExpanded by remember { derivedStateOf { !listState.canScrollBackward } }
+    LaunchedEffect(searchQuery, typeFilter) {
+        listState.scrollToItem(0)
+    }
 
     fun deleteWithUndo(word: Word) {
         viewModel.deleteWord(word)
@@ -423,14 +437,8 @@ fun WordListScreen(
                 WordListFilters(
                     query = searchQuery,
                     selectedType = typeFilter,
-                    onQueryChange = {
-                        searchQuery = it
-                        scope.launch { listState.scrollToItem(0) }
-                    },
-                    onTypeChange = {
-                        typeFilter = it
-                        scope.launch { listState.scrollToItem(0) }
-                    },
+                    onQueryChange = { searchQuery = it },
+                    onTypeChange = { typeFilter = it },
                 )
                 if (filtersActive) {
                     Text(
@@ -464,7 +472,7 @@ fun WordListScreen(
                         }
                     }
                     if (overdueCount > 0) {
-                        if (!filtersActive) item {
+                        if (!filtersActive) item(key = "overdue_banner") {
                             OverdueCard(
                                 count = overdueCount,
                                 onClick = onNavigateToOverdueReview,
